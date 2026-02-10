@@ -1,13 +1,4 @@
 Item Trading Platform
-A one-stop trading ecosystem combining new and second-hand item transactions.
-Core Features
-User/merchant/admin role-based access control
-Product release, search, and review management
-Order creation, payment, and status tracking
-Second-hand item trading and request posting
-Tech Stack
-Frontend: Vue, AxiosBackend: Servlet, MyBatisDatabase: MySQLDeployment: Tomcat
-Item Trading Platform
 A comprehensive and scalable item trading platform that integrates new product shopping and second-hand item transactions, supporting collaborative interaction among three core roles: users, merchants, and administrators. The platform is built with a front-end and back-end separation architecture to ensure high performance, security, and maintainability, while solving key issues such as cross-domain requests, data consistency, and role-based permission control.
 Core Features
 User Module
@@ -85,6 +76,7 @@ bash
 cd frontend
 npm run dev
 Access the platform: http://localhost:8080 (adjust port according to your Tomcat/frontend configuration)
+
 Feature Highlights
 Security: BCrypt password encryption and session management prevent unauthorized access
 Performance: MyBatis-based database operation optimization and pagination query reduce server load
