@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 命名空间与Dao接口全路径一致 -->
+<mapper namespace="dao.CommentDao">
+
+    <!-- 1. 根据商品ID分页查询评论（关联用户表获取用户名） -->
+    <select id="getCommentsByGoodsId" resultType="map">
+        SELECT
+        c.id,
+        c.content,
+        c.user_id AS userId,
+        u.username AS userName,  <!-- 假设用户表中用户名为username -->
+        c.time,
+        c.goods_id AS goodsId
+        FROM
+        comment c
+        LEFT JOIN
+        user u ON c.user_id = u.id  <!-- 关联用户表查询用户名 -->
+        WHERE
+        c.goods_id = #{goodsId}  <!-- 只查询当前商品的评论 -->
+        ORDER BY
+        c.time DESC  <!-- 按评论时间倒序排列（最新的在前） -->
+        LIMIT #{startIndex}, #{pageSize}  <!-- 分页 -->
+    </select>
+
+    <!-- 2. 查询某商品的评论总数 -->
+    <select id="getCommentCountByGoodsId" resultType="int">
+        SELECT COUNT(*)
+        FROM comment
+        WHERE goods_id = #{goodsId}  <!-- 统计当前商品的评论总数 -->
+    </select>
+
+    <!-- 3. 添加新评论 -->
+    <insert id="addComment" parameterType="entity.Comment">
+        INSERT INTO comment (
+        content,
+        user_id,
+        time,
+        goods_id
+        ) VALUES (
+        #{content},  <!-- 评论内容 -->
+        #{userId},   <!-- 评论人ID -->
+        #{time},     <!-- 评论时间 -->
+        #{goodsId}   <!-- 关联的商品ID -->
+        )
+    </insert>
+
+    <!-- 4. 根据用户ID查询该用户的所有评论（关联商品表获取商品信息） -->
+    <select id="getCommentsByUserId" resultType="map">
+        SELECT
+        c.id,
+        c.content,
+        c.time,
+        c.goods_id AS goodsId,
+        g.name AS name,  <!-- 商品名称 -->
+        g.img AS img,    <!-- 商品图片 -->
+        g.price AS price  <!-- 商品价格 -->
+        FROM
+        comment c
+        LEFT JOIN
+        goods g ON c.goods_id = g.id  <!-- 关联商品表获取商品信息 -->
+        WHERE
+        c.user_id = #{userId}  <!-- 只查询当前用户的评论 -->
+        ORDER BY
+        c.time DESC  <!-- 按评论时间倒序排列 -->
+    </select>
+
+    <!-- 5. 根据评论ID删除评论 -->
+    <delete id="deleteCommentById" parameterType="int">
+        DELETE FROM comment
+        WHERE id = #{id}  <!-- 根据评论ID删除 -->
+    </delete>
+
+</mapper>

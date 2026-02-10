@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <settings>
+        <!-- 启用自动驼峰命名映射 -->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+    </settings>
+
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="POOLED">
+                <property name="driver" value="com.mysql.cj.jdbc.Driver"/>
+                <!-- 转义URL中的&符号 -->
+                <property name="url" value="jdbc:mysql://localhost:3306/shop_db?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8"/>
+                <property name="username" value="root"/>
+                <property name="password" value="WHJwhj355833"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <mappers>
+        <mapper resource="mappers/CommentMapper.xml"/>
+        <mapper resource="mappers/OrdersMapper.xml"/>
+        <mapper resource="mappers/ChatInfoMapper.xml"/>
+        <mapper resource="mappers/ChatGroupMapper.xml"/>
+        <mapper resource="mappers/CategoryMapper.xml"/>
+        <mapper resource="mappers/CollectMapper.xml"/>
+        <mapper resource="mappers/GoodsMapper.xml"/>
+        <mapper resource="mappers/HelpMapper.xml"/>
+        <mapper resource="mappers/AddressMapper.xml"/>
+        <mapper resource="mappers/AdminMapper.xml"/>
+        <mapper resource="mappers/NoticeMapper.xml"/>
+        <mapper resource="mappers/UserMapper.xml"/>
+    </mappers>
+</configuration>

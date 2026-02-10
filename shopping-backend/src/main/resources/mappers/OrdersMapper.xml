@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.OrdersDao">
+    <!-- 已有的其他映射保持不变 -->
+
+    <!-- 新增：通过商品名称查询订单（模糊查询） -->
+    <select id="getOrdersByName" parameterType="string" resultType="entity.Orders">
+        SELECT
+        id,
+        goods_name AS goodsName,
+        goods_img AS goodsImg,
+        goods_price AS goodsPrice,
+        count,
+        order_no AS orderNo,
+        total,
+        time,
+        pay_no AS payNo,
+        pay_time AS payTime,
+        user_id AS userId,
+        address,
+        phone,
+        user_name AS userName,
+        status,
+        sale_id AS saleId
+        FROM orders
+        WHERE goods_name = #{goodsName}
+        ORDER BY time DESC  <!-- 按时间倒序排列 -->
+    </select>
+
+    <select id="getOrdersBySaleId" parameterType="int" resultType="entity.Orders" flushCache="true">
+        SELECT
+        id,
+        goods_name AS goodsName,
+        goods_img AS goodsImg,
+        goods_price AS goodsPrice,
+        count,
+        order_no AS orderNo,
+        total,
+        time,
+        pay_no AS payNo,
+        pay_time AS payTime,
+        user_id AS userId,
+        address,
+        phone,
+        user_name AS userName,
+        status,
+        sale_id AS saleId
+        FROM orders
+        WHERE sale_id = #{saleId}  <!-- 按商家saleId筛选订单 -->
+        ORDER BY time DESC  <!-- 按时间倒序 -->
+    </select>
+    <!-- 查询所有订单 -->
+    <select id="getAllOrders" resultType="entity.Orders">
+        SELECT * FROM orders
+    </select>
+
+    <!-- 根据ID查询订单 -->
+    <select id="getOrderById" parameterType="int" resultType="entity.Orders">
+        SELECT * FROM orders WHERE id = #{id}
+    </select>
+
+    <update id="updateOrderStatus" parameterType="map">
+        UPDATE orders
+        SET status = #{status},
+        pay_no = COALESCE(#{payNo}, pay_no),  <!-- 若 payNo 为 null 则保留原值 -->
+        pay_time = COALESCE(#{payTime}, pay_time)  <!-- 若 payTime 为 null 则保留原值 -->
+        WHERE id = #{orderId}  <!-- 按订单ID更新 -->
+    </update>
+
+    <!-- 新增：根据用户ID查询订单列表（解决核心错误） -->
+    <select id="getOrdersByUserId" parameterType="int" resultType="entity.Orders">
+        SELECT
+        id,
+        goods_name AS goodsName,
+        goods_img AS goodsImg,
+        goods_price AS goodsPrice,
+        count,
+        order_no AS orderNo,
+        total,
+        time,
+        pay_no AS payNo,
+        pay_time AS payTime,
+        user_id AS userId,
+        address,
+        phone,
+        user_name AS userName,
+        status,
+        sale_id AS saleId
+        FROM orders
+        WHERE user_id = #{userId}  <!-- 按用户ID筛选订单 -->
+        ORDER BY time DESC  <!-- 按时间倒序，最新订单在前 -->
+    </select>
+
+    <!-- 创建订单（已有内容保持不变） -->
+    <insert id="insertOrder" parameterType="entity.Orders"
+            useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO orders (
+            goods_name, goods_img, goods_price, count,
+            order_no, total, time,
+            pay_no, pay_time,
+            user_id, address, phone, user_name, status, sale_id
+        ) VALUES (
+                     #{goodsName}, #{goodsImg}, #{goodsPrice}, #{count},
+                     #{orderNo}, #{total}, #{time},
+                     COALESCE(#{payNo}, '111'),
+                     COALESCE(#{payTime}, '111'),
+                     #{userId}, #{address}, #{phone}, #{userName}, #{status}, #{saleId}
+                 )
+    </insert>
+
+    <!-- 更新订单（已有内容保持不变） -->
+    <update id="updateOrder" parameterType="entity.Orders">
+        UPDATE orders
+        SET goods_name = #{goodsName},
+            goods_img = #{goodsImg},
+            goods_price = #{goodsPrice},
+            count = #{count},
+            order_no = #{orderNo},
+            total = #{total},
+            time = #{time},
+            pay_no = COALESCE(#{payNo}, ''),
+            pay_time = COALESCE(#{payTime}, ''),
+            user_id = #{userId},
+            address = #{address},
+            phone = #{phone},
+            user_name = #{userName},
+            status = #{status},
+            sale_id = #{saleId}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除订单（已有内容保持不变） -->
+    <delete id="deleteOrder" parameterType="int">
+        DELETE FROM orders WHERE id = #{id}
+    </delete>
+</mapper>

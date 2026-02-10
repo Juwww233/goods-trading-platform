@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.ChatGroupDao">
+    <select id="getAllChatGroups" resultType="entity.ChatGroup">
+        SELECT * FROM chat_group
+    </select>
+    <select id="getChatGroupById" parameterType="int" resultType="entity.ChatGroup">
+        SELECT * FROM chat_group WHERE id = #{id}
+    </select>
+    <insert id="insertChatGroup" parameterType="entity.ChatGroup">
+        INSERT INTO chat_group (chat_user_id, user_id)
+        VALUES (#{chatUserId}, #{userId})
+    </insert>
+    <update id="updateChatGroup" parameterType="entity.ChatGroup">
+        UPDATE chat_group
+        SET chat_user_id = #{chatUserId},
+            user_id = #{userId}
+        WHERE id = #{id}
+    </update>
+    <delete id="deleteChatGroup" parameterType="int">
+        DELETE FROM chat_group WHERE id = #{id}
+    </delete>
+</mapper>

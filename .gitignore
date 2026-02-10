@@ -1,0 +1,68 @@
+# Maven 编译产物（保留你原有规则）
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# 前端 Vue 核心忽略（重点补充）
+shopping-frontend/vue/node_modules/
+shopping-frontend/vue/dist/          # Vue打包产物
+shopping-frontend/vue/.env           # 环境变量文件
+shopping-frontend/vue/.env.*         # 多环境变量（如.env.development）
+shopping-frontend/vue/package-lock.json # npm依赖锁文件
+shopping-frontend/vue/yarn.lock      # yarn依赖锁文件
+shopping-frontend/vue/npm-debug.log  # npm错误日志
+shopping-frontend/vue/.npmrc         # npm配置文件
+shopping-frontend/vue/yarn-error.log # yarn错误日志
+
+# IntelliJ IDEA（保留你原有规则）
+.idea/modules.xml
+.idea/jarRepositories.xml
+.idea/compiler.xml
+.idea/libraries/
+*.iws
+*.iml
+*.ipr
+
+# Eclipse（保留你原有规则）
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# NetBeans（保留你原有规则）
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# VS Code（保留你原有规则）
+.vscode/
+
+# Mac OS（保留你原有规则）
+.DS_Store
+
+# 补充：Windows 系统缓存
+Thumbs.db
+Desktop.ini
+
+# 补充：通用日志/临时文件
+*.log
+*.log.*
+tmp/
+temp/
+*.tmp
+*.temp
+
+# 补充：Java 通用冗余
+*.jar
+*.war
+*.ear
+*.orig

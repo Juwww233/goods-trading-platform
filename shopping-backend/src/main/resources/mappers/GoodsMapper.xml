@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.GoodsDao">
+
+    <!-- 管理员获取商品列表 -->
+    <select id="getAdminGoodsList" resultType="entity.Goods">
+        SELECT
+        g.*,
+        u.username AS sellerName  -- 关联用户表，获取卖家用户名
+        FROM goods g
+        LEFT JOIN user u ON g.user_id = u.id  -- 通过 user_id 关联用户表
+        WHERE
+        1=1
+        <if test="keyword != null and keyword != ''">
+            AND (g.name LIKE CONCAT('%', #{keyword}, '%') OR g.id = #{keyword})
+        </if>
+        <if test="status != null and status != ''">
+            AND g.status = #{status}  -- 用中文状态值筛选（如“未审核”）
+        </if>
+        ORDER BY g.date DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <!-- 计算管理员商品总数 -->
+    <select id="countAdminGoods" resultType="int">
+        SELECT COUNT(*)
+        FROM goods
+        WHERE
+        1=1
+        <if test="keyword != null and keyword != ''">
+            AND (name LIKE CONCAT('%', #{keyword}, '%')
+            OR id = #{keyword})
+        </if>
+        <if test="status != null and status != ''">
+            AND status = #{status}
+        </if>
+    </select>
+
+    <!-- 更新商品状态 -->
+    <update id="updateGoodsStatus">
+        UPDATE goods
+        SET status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 更新商品状态和拒绝原因 -->
+    <update id="updateGoodsStatusAndReason">
+        UPDATE goods
+        SET status = #{status},
+            reason = #{reason}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 按ID查询商品（含详情） -->
+    <select id="getIdByName" parameterType="string" resultType="int">
+        SELECT id FROM goods
+        WHERE name = #{goodsName}
+            LIMIT 1
+    </select>
+
+    <select id="getGoodsById" parameterType="int" resultType="entity.Goods">
+        SELECT * FROM goods WHERE id = #{id}
+    </select>
+
+    <select id="getGoodsByCategory" resultType="entity.Goods">
+        SELECT * FROM goods
+        WHERE category = #{category}
+        AND status = '审核通过'
+        AND sale_status = '已上架'
+    </select>
+
+    <!-- 查询所有上架商品（审核通过+已上架） -->
+    <select id="getOnSaleGoods" resultType="entity.Goods">
+        SELECT * FROM goods
+        WHERE status = '审核通过'
+          AND sale_status = '已上架'
+    </select>
+
+    <!-- 随机推荐上架商品 -->
+    <select id="getRandomOnSaleGoods" parameterType="int" resultType="entity.Goods">
+        SELECT * FROM goods
+        WHERE status = '审核通过'
+          AND sale_status = '已上架'
+          AND category != '二手物品'
+        ORDER BY RAND() LIMIT #{limit}
+    </select>
+
+    <!-- 查询二手物品 -->
+    <select id="getSecondHandGoods" resultType="entity.Goods">
+        SELECT * FROM goods
+        WHERE category = '二手物品'
+          AND status = '审核通过'
+          AND sale_status = '已上架'
+    </select>
+
+    <!-- 搜索商品（名称/详情模糊匹配，仅上架商品） -->
+    <select id="searchGoods" parameterType="string" resultType="entity.Goods">
+        SELECT * FROM goods
+        WHERE (name LIKE CONCAT('%', #{keyword}, '%')
+            OR content LIKE CONCAT('%', #{keyword}, '%'))
+          AND status = '审核通过'
+          AND sale_status = '已上架'
+    </select>
+
+    <!-- 新增商品 -->
+    <insert id="addGoods" parameterType="entity.Goods">
+        INSERT INTO goods (name, price, content, address, img, date,  <!-- 修正为date -->
+        status, category, user_id, sale_status, read_count)
+        VALUES (#{name}, #{price}, #{content}, #{address}, #{img}, #{date},  <!-- 修正为date -->
+        #{status}, #{category}, #{userId}, #{saleStatus}, #{readCount})
+    </insert>
+
+    <!-- 更新商品信息 -->
+    <update id="updateGoods" parameterType="entity.Goods">
+        UPDATE goods SET
+        name = #{name},
+        price = #{price},
+        content = #{content},
+        address = #{address},
+        img = #{img},
+        date = #{date},  <!-- 修正为date -->
+        status = #{status},
+        category = #{category},
+        user_id = #{userId},
+        sale_status = #{saleStatus},
+        read_count = #{readCount}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 浏览量+1 -->
+    <update id="incrementReadCount" parameterType="int">
+        UPDATE goods
+        SET read_count = read_count + 1
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除商品 -->
+    <delete id="deleteGoods" parameterType="int">
+        DELETE FROM goods WHERE id = #{id}
+    </delete>
+
+    <!-- 查询用户发布的商品 -->
+    <select id="getGoodsByUserId" parameterType="int" resultType="entity.Goods">
+        SELECT * FROM goods
+        WHERE user_id = #{userId}
+        <!-- 可选：添加状态过滤 -->
+        <!-- AND status IN ('审核通过', '待审核') -->
+    </select>
+</mapper>

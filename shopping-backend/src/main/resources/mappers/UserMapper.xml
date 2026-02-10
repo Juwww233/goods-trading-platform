@@ -1,0 +1,82 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.UserDao">
+    <resultMap id="BaseResultMap" type="entity.User">
+        <id column="id" property="id"/>
+        <result column="username" property="userName"/>
+        <result column="password" property="password"/>
+        <result column="name" property="name"/>
+        <result column="avatar" property="avatar"/>
+        <result column="role" property="role"/>
+        <result column="phone" property="phone"/>
+    </resultMap>
+    <select id="findUser" parameterType="String" resultMap="BaseResultMap">
+        select * from user where username=#{username}
+    </select>
+    <select id="getAllUsers" resultMap="BaseResultMap">
+        select * from user
+    </select>
+    <select id="getUserRole"  parameterType="String" resultType="String">
+        select user.role from user where username=#{userName}
+    </select>
+    <select id="getUserId" parameterType="String" resultType="int">
+        select user.id from user where username=#{userName}
+    </select>
+    <!-- 添加 findById 方法的映射 -->
+    <select id="findById" parameterType="int" resultMap="BaseResultMap">
+        SELECT * FROM user WHERE id = #{id}
+    </select>
+
+    <!-- 新增：分页+搜索查询用户 -->
+    <select id="findUsersByPage" resultMap="BaseResultMap">
+        SELECT * FROM user
+        <where>
+            <!-- 支持按用户名、手机号搜索 -->
+            <if test="keyword != ''">
+                AND (username LIKE CONCAT('%', #{keyword}, '%')
+                OR phone LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        ORDER BY id DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <update id="updatePassword" parameterType="map">
+        UPDATE user
+        SET password = #{newPassword}
+        WHERE id = #{userId}
+    </update>
+    <!-- 新增：统计用户总数 -->
+    <select id="countUsers" resultType="int">
+        SELECT COUNT(*) FROM user
+        <where>
+            <if test="keyword != ''">
+                AND (username LIKE CONCAT('%', #{keyword}, '%')
+                OR phone LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertUser" parameterType="entity.User" useGeneratedKeys="true" keyProperty="id">
+        insert into user(username, password, name, avatar, role, phone)
+        VALUES (#{userName},#{password},#{name},#{avatar},#{role},#{phone})
+    </insert>
+
+
+    <delete id="deleteUser" parameterType="int">
+        DELETE FROM user WHERE id = #{id}
+    </delete>
+    <update  id="updateUser" parameterType="entity.User">
+        UPDATE  user
+        <set>
+            <if test="userName!=null">username=#{userName},</if>
+            <if test="password!=null">password=#{password},</if>
+            <if test="name!=null">name=#{name},</if>
+            <if test="avatar!=null">avatar=#{avatar},</if>
+            <if test="role!=null">role=#{role},</if>
+            <if test="phone!=null">phone=#{phone},</if>
+        </set>
+        where id=#{id}
+    </update>
+</mapper>

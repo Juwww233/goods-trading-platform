@@ -1,0 +1,165 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.example</groupId>
+    <artifactId>shopping2</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>war</packaging>
+
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <!-- 明确指定后端源码根目录（方便后续引用） -->
+        <backend.src.dir>${project.basedir}/shopping-backend/src/main</backend.src.dir>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis</artifactId>
+                <version>3.5.9</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>2.15.3</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <!-- Servlet API -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- JSP API -->
+        <dependency>
+            <groupId>javax.servlet.jsp</groupId>
+            <artifactId>jsp-api</artifactId>
+            <version>2.2</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- JSTL -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+            <version>1.2</version>
+        </dependency>
+
+        <!-- MyBatis -->
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+        </dependency>
+
+        <!-- MySQL Connector -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.26</version> <!-- 升级到较新稳定版 -->
+        </dependency>
+
+        <!-- Logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.36</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.11</version>
+        </dependency>
+
+        <!-- Jackson（JSON处理） -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <!-- 部署后的上下文路径（与前端代理目标一致） -->
+        <finalName>shopping2</finalName>
+
+        <!-- 明确指定Java源码目录 -->
+        <sourceDirectory>${backend.src.dir}/java</sourceDirectory>
+        <!-- 明确指定资源文件目录（MyBatis映射文件、配置文件等） -->
+        <resources>
+            <resource>
+                <directory>${backend.src.dir}/resources</directory>
+                <includes>
+                    <include>**/*.xml</include> <!-- 包含MyBatis的mapper文件 -->
+                    <include>**/*.properties</include> <!-- 包含配置文件 -->
+                    <include>**/*.yml</include> <!-- 若有yml配置 -->
+                </includes>
+                <!-- 过滤资源文件中的变量（如${xxx}） -->
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
+        <plugins>
+            <!-- 编译插件：确保Java文件编译为.class -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version> <!-- 升级到稳定新版本 -->
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <encoding>UTF-8</encoding>
+                    <compilerArgs>
+                        <arg>-encoding</arg>
+                        <arg>UTF-8</arg> <!-- 强制编译器使用UTF-8编码 -->
+                    </compilerArgs>
+                    <!-- 编译输出目录（默认target/classes） -->
+                    <outputDirectory>${project.build.directory}/classes</outputDirectory>
+                </configuration>
+            </plugin>
+
+            <!-- WAR打包插件：确保.class和资源文件正确放入WEB-INF/classes -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.4.0</version> <!-- 升级到最新稳定版 -->
+                <configuration>
+                    <!-- 明确指定webapp目录（若有JSP、静态资源等） -->
+                    <webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
+                    <!-- 强制打包编译后的class文件和资源文件 -->
+                    <webResources>
+                        <!-- 1. 打包编译后的.class文件 -->
+                        <resource>
+                            <directory>${project.build.outputDirectory}</directory>
+                            <targetPath>WEB-INF/classes</targetPath> <!-- 放入WAR包的WEB-INF/classes -->
+                        </resource>
+                        <!-- 2. 打包webapp目录下的文件（如web.xml，若存在） -->
+                        <resource>
+                            <directory>${backend.src.dir}/webapp</directory> <!-- 若有webapp目录 -->
+                            <targetPath>WEB-INF</targetPath> <!-- 放入WEB-INF -->
+                        </resource>
+                    </webResources>
+                </configuration>
+            </plugin>
+
+            <!-- 资源处理插件：确保资源文件编码正确 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

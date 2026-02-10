@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> <!-- 修正DTD路径为官方URL -->
+<mapper namespace="dao.HelpDao">
+    <!-- 使用全限定类名entity.Help -->
+    <resultMap id="BaseResultMap" type="entity.Help">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="img" property="img"/>
+        <result column="status" property="status"/>
+        <result column="user_id" property="userId"/>
+        <result column="time" property="time"/>
+        <result column="solved" property="solved"/>
+    </resultMap>
+
+    <!-- parameterType使用全限定类名 -->
+    <insert id="insert" parameterType="entity.Help" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO help (title, content, img, status, user_id, time, solved)
+        VALUES (#{title}, #{content}, #{img}, #{status}, #{userId}, #{time}, #{solved})
+    </insert>
+
+    <update id="update" parameterType="entity.Help">
+        UPDATE help SET
+                        title = #{title},
+                        content = #{content},
+                        img = #{img},
+                        status = #{status},
+                        user_id = #{userId},
+                        time = #{time},
+                        solved = #{solved}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById" parameterType="int">
+        DELETE FROM help WHERE id = #{id}
+    </delete>
+
+    <select id="selectById" parameterType="int" resultMap="BaseResultMap">
+        SELECT * FROM help WHERE id = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT * FROM help
+    </select>
+
+    <select id="selectByUserId" parameterType="int" resultMap="BaseResultMap">
+        SELECT * FROM help WHERE user_id = #{userId}
+    </select>
+</mapper>
